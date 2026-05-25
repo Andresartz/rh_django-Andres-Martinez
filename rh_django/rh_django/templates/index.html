@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Recursos Humanos</title>
+  <meta name="description" content="Panel de gestión de empleados para el sistema de Recursos Humanos." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #07040e;
+      --surface: #110a21;
+      --surface2: #190f2f;
+      --border: #3a206b;
+      --border-light: #552e9c;
+      --accent: #8b5cf6;
+      --accent2: #5b21b6;
+      --accent3: #c084fc;
+      --gold: #ebd5ff;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --text: #f3f0f7;
+      --text-muted: #9f90b8;
+      --radius: 12px;
+      --shadow: 0 8px 40px rgba(45, 12, 80, 0.5);
+      --glow: 0 0 30px rgba(139, 92, 246, 0.25);
+    }
+
+    body {
+      font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse at 15% 0%, rgba(91, 33, 182, 0.4) 0%, transparent 60%),
+        radial-gradient(ellipse at 85% 100%, rgba(139, 92, 246, 0.18) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(17, 10, 33, 0.6) 0%, transparent 70%);
+    }
+
+    /* ── HEADER ─────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, rgba(25, 15, 47, 0.98) 0%, rgba(7, 4, 14, 0.98) 60%, rgba(17, 10, 33, 0.98) 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 4px 30px rgba(45, 12, 80, 0.5), inset 0 1px 0 rgba(235, 213, 255, 0.1);
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(139, 92, 246, 0.6) 30%, rgba(235, 213, 255, 0.4) 50%, rgba(139, 92, 246, 0.6) 70%, transparent 100%);
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .header-title h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+    .header-title span { font-size: 12px; color: var(--text-muted); }
+    .status-dot {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--success);
+    }
+    .status-dot::before {
+      content: '';
+      width: 8px; height: 8px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+      box-shadow: 0 0 8px rgba(74,222,128,0.6);
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    /* ── MAIN LAYOUT ────────────────────────── */
+    .main { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+    /* ── STATS CARDS ────────────────────────── */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: linear-gradient(145deg, rgba(17, 10, 33, 0.95) 0%, rgba(25, 15, 47, 0.8) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      position: relative;
+      overflow: hidden;
+      transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+      backdrop-filter: blur(10px);
+    }
+    .stat-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+      box-shadow: var(--glow), var(--shadow);
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent2), var(--accent), var(--gold));
+    }
+    .stat-card::after {
+      content: '';
+      position: absolute; top: -40px; right: -20px;
+      width: 110px; height: 110px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .stat-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
+    .stat-value { font-size: 28px; font-weight: 700; }
+    .stat-value.green { color: var(--success); text-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
+    .stat-value.blue { color: var(--accent3); text-shadow: 0 0 20px rgba(192, 132, 252, 0.35); }
+
+    /* ── TOOLBAR ────────────────────────────── */
+    .toolbar {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      flex: 1; min-width: 200px;
+      background: rgba(17, 10, 33, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0 14px;
+      display: flex; align-items: center; gap: 8px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .search-box:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+    }
+    .search-box input {
+      background: none; border: none; outline: none;
+      color: var(--text); font-size: 14px; font-family: inherit;
+      width: 100%; padding: 10px 0;
+    }
+    .search-box input::placeholder { color: var(--text-muted); }
+    .search-box svg { flex-shrink: 0; color: var(--text-muted); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: none; cursor: pointer;
+      font-size: 14px; font-weight: 500; font-family: inherit;
+      transition: all .25s ease; white-space: nowrap;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.55);
+      background: linear-gradient(135deg, var(--accent3) 0%, var(--accent) 100%);
+    }
+    .btn-ghost {
+      background: rgba(17, 10, 33, 0.7); border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); background: rgba(139, 92, 246, 0.1); }
+
+    /* ── TABLE ──────────────────────────────── */
+    .table-wrap {
+      background: linear-gradient(180deg, rgba(17, 10, 33, 0.97) 0%, rgba(7, 4, 14, 0.95) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(235, 213, 255, 0.06);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr {
+      background: linear-gradient(90deg, rgba(25, 15, 47, 0.98) 0%, rgba(17, 10, 33, 0.95) 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      padding: 13px 18px;
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .8px;
+      color: var(--text-muted);
+      text-align: left;
+    }
+    td { padding: 14px 18px; font-size: 14px; border-bottom: 1px solid rgba(67, 37, 122, 0.4); }
+    tbody tr { transition: background .15s; }
+    tbody tr:hover { background: rgba(139, 92, 246, 0.07); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px; font-weight: 500;
+    }
+    .badge-dept {
+      background: rgba(139, 92, 246, 0.15);
+      color: var(--accent3);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    .avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 13px;
+      margin-right: 10px; flex-shrink: 0;
+      box-shadow: 0 3px 10px rgba(139, 92, 246, 0.4);
+    }
+    .name-cell { display: flex; align-items: center; }
+
+    .action-btn {
+      width: 30px; height: 30px; border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--text-muted); transition: all .2s; margin-left: 4px;
+    }
+    .action-btn:hover.edit { border-color: var(--accent); color: var(--accent); background: rgba(139, 92, 246, 0.12); }
+    .action-btn:hover.del { border-color: var(--danger); color: var(--danger); background: rgba(244,63,94,.1); }
+
+    /* ── EMPTY STATE ────────────────────────── */
+    .empty {
+      text-align: center; padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: .4; }
+
+    /* ── LOADING ────────────────────────────── */
+    .spinner {
+      width: 22px; height: 22px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin: 0 auto;
+      box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-row td { text-align: center; padding: 40px; }
+
+    /* ── MODAL ──────────────────────────────── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(5, 2, 10, 0.85); backdrop-filter: blur(8px);
+      z-index: 200; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .25s;
+    }
+    .overlay.open { opacity: 1; pointer-events: auto; }
+    .modal {
+      background: linear-gradient(145deg, var(--surface) 0%, var(--surface2) 100%);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%; max-width: 440px;
+      box-shadow: 0 24px 80px rgba(45, 12, 80, 0.75), inset 0 1px 0 rgba(235, 213, 255, 0.12);
+      transform: translateY(20px) scale(.97);
+      transition: transform .25s;
+    }
+    .overlay.open .modal { transform: translateY(0) scale(1); }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .modal-title { font-size: 18px; font-weight: 700; }
+    .modal-close {
+      width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+      background: none; cursor: pointer; color: var(--text-muted);
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+    }
+    .modal-close:hover { border-color: var(--danger); color: var(--danger); background: rgba(244,63,94,.08); }
+
+    .form-group { margin-bottom: 18px; }
+    .form-label { display: block; font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
+    .form-input {
+      width: 100%; padding: 10px 14px;
+      background: rgba(7, 4, 14, 0.9); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text);
+      font-size: 14px; font-family: inherit; outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .form-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+    }
+    .form-input::placeholder { color: var(--text-muted); }
+    .form-actions { display: flex; gap: 10px; margin-top: 24px; }
+    .form-actions .btn { flex: 1; justify-content: center; }
+
+    /* ── TOAST ──────────────────────────────── */
+    .toast-area { position: fixed; bottom: 24px; right: 24px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 18px;
+      font-size: 14px; display: flex; align-items: center; gap: 10px;
+      animation: slideIn .3s ease;
+      box-shadow: var(--shadow);
+    }
+    .toast.success { border-left: 3px solid var(--success); }
+    .toast.error   { border-left: 3px solid var(--danger); }
+    @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideOut { to { transform: translateX(110%); opacity: 0; } }
+
+    /* ── CONFIRM DIALOG ─────────────────────── */
+    .confirm-modal { max-width: 380px; text-align: center; }
+    .confirm-modal p { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
+    .confirm-modal .form-actions { justify-content: center; }
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger), #be1239);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(244,63,94,0.3);
+    }
+    .btn-danger:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(244,63,94,0.45); }
+
+    /* ── RESPONSIVE ─────────────────────────── */
+    @media (max-width: 650px) {
+      .stats { grid-template-columns: 1fr; gap: 12px; }
+      .header { padding: 0 16px; }
+      .main { padding: 20px 12px; }
+      th:nth-child(2), td:nth-child(2) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-icon">👥</div>
+    <div class="header-title">
+      <h1>Recursos Humanos</h1>
+      <span>Panel de Gestión de Empleados</span>
+    </div>
+  </div>
+  <div class="status-dot" id="status-label">Conectado</div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Total Empleados</div>
+      <div class="stat-value blue" id="stat-total">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Sueldo Promedio</div>
+      <div class="stat-value" id="stat-avg">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Departamentos</div>
+      <div class="stat-value green" id="stat-depts">—</div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="search-box">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input id="search" type="text" placeholder="Buscar por nombre o departamento…" oninput="filterTable()" />
+    </div>
+    <button class="btn btn-ghost" onclick="loadEmpleados()" id="refresh-btn">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+      Actualizar
+    </button>
+    <button class="btn btn-primary" id="add-btn" onclick="openModal()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nuevo Empleado
+    </button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Empleado</th>
+          <th>Departamento</th>
+          <th>Sueldo</th>
+          <th style="text-align:right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr class="loading-row"><td colspan="5"><div class="spinner"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<!-- MODAL FORM -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Nuevo Empleado</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <form id="emp-form" onsubmit="submitForm(event)">
+      <input type="hidden" id="emp-id" />
+      <div class="form-group">
+        <label class="form-label" for="inp-nombre">Nombre completo</label>
+        <input class="form-input" id="inp-nombre" type="text" placeholder="Ej: Ana García" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inp-dept">Departamento</label>
+        <input class="form-input" id="inp-dept" type="text" placeholder="Ej: Sistemas, Finanzas…" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inp-sueldo">Sueldo mensual (MXN)</label>
+        <input class="form-input" id="inp-sueldo" type="number" step="0.01" min="0" placeholder="Ej: 25000.00" required />
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="submit-btn">Guardar Empleado</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE MODAL -->
+<div class="overlay" id="confirm-overlay" onclick="confirmOverlayClick(event)">
+  <div class="modal confirm-modal" id="confirm-modal">
+    <div class="modal-header" style="justify-content:center;margin-bottom:12px">
+      <span style="font-size:36px">🗑️</span>
+    </div>
+    <div class="modal-title" style="margin-bottom:10px">¿Eliminar empleado?</div>
+    <p id="confirm-msg">Esta acción no se puede deshacer.</p>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeConfirm()">Cancelar</button>
+      <button class="btn btn-danger" id="confirm-delete-btn">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST AREA -->
+<div class="toast-area" id="toast-area"></div>
+
+<script>
+  const API = 'http://localhost:8000/api/empleados/';
+  let allData = [];
+  let pendingDeleteId = null;
+
+  /* ─ FETCH helpers ─ */
+  async function api(path, opts = {}) {
+    opts.headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+    const r = await fetch(API + path, opts);
+    if (!r.ok) throw new Error(await r.text());
+    if (r.status === 204) return null;
+    return r.json();
+  }
+
+  /* ─ LOAD ─ */
+  async function loadEmpleados() {
+    document.getElementById('tbody').innerHTML = '<tr class="loading-row"><td colspan="5"><div class="spinner"></div></td></tr>';
+    try {
+      allData = await api('');
+      renderTable(allData);
+      updateStats(allData);
+    } catch (e) {
+      document.getElementById('tbody').innerHTML = '<tr><td colspan="5" class="empty"><div class="empty-icon">⚠️</div>No se pudo conectar a la API.<br><small>¿Está corriendo el servidor en localhost:8000?</small></td></tr>';
+      toast('Error al cargar empleados', 'error');
+    }
+  }
+
+  /* ─ RENDER TABLE ─ */
+  function renderTable(data) {
+    const tbody = document.getElementById('tbody');
+    if (!data.length) {
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty"><div class="empty-icon">👥</div>No hay empleados registrados aún.</div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.map(e => {
+      const initials = e.nombre.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+      const sueldo = Number(e.sueldo).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+      return `<tr>
+        <td style="color:var(--text-muted);font-size:12px">#${e.idEmpleado}</td>
+        <td><div class="name-cell"><div class="avatar">${initials}</div>${e.nombre}</div></td>
+        <td><span class="badge badge-dept">${e.departamento}</span></td>
+        <td style="font-weight:600">${sueldo}</td>
+        <td style="text-align:right">
+          <button class="action-btn edit" title="Editar" onclick="openEdit(${e.idEmpleado})">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="action-btn del" title="Eliminar" onclick="confirmDelete(${e.idEmpleado}, '${e.nombre.replace(/'/g,"\\'")}')">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  /* ─ STATS ─ */
+  function updateStats(data) {
+    document.getElementById('stat-total').textContent = data.length;
+    const avg = data.length ? data.reduce((s, e) => s + Number(e.sueldo), 0) / data.length : 0;
+    document.getElementById('stat-avg').textContent = avg.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+    const depts = new Set(data.map(e => e.departamento)).size;
+    document.getElementById('stat-depts').textContent = depts;
+  }
+
+  /* ─ FILTER ─ */
+  function filterTable() {
+    const q = document.getElementById('search').value.toLowerCase();
+    const filtered = allData.filter(e =>
+      e.nombre.toLowerCase().includes(q) || e.departamento.toLowerCase().includes(q)
+    );
+    renderTable(filtered);
+  }
+
+  /* ─ MODAL ─ */
+  function openModal(emp = null) {
+    document.getElementById('emp-id').value = emp ? emp.idEmpleado : '';
+    document.getElementById('inp-nombre').value = emp ? emp.nombre : '';
+    document.getElementById('inp-dept').value = emp ? emp.departamento : '';
+    document.getElementById('inp-sueldo').value = emp ? emp.sueldo : '';
+    document.getElementById('modal-title').textContent = emp ? 'Editar Empleado' : 'Nuevo Empleado';
+    document.getElementById('submit-btn').textContent = emp ? 'Guardar Cambios' : 'Guardar Empleado';
+    document.getElementById('overlay').classList.add('open');
+    setTimeout(() => document.getElementById('inp-nombre').focus(), 100);
+  }
+  function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+  function overlayClick(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
+
+  async function openEdit(id) {
+    const emp = allData.find(e => e.idEmpleado === id);
+    if (emp) openModal(emp);
+  }
+
+  /* ─ SUBMIT FORM ─ */
+  async function submitForm(e) {
+    e.preventDefault();
+    const id = document.getElementById('emp-id').value;
+    const body = {
+      nombre: document.getElementById('inp-nombre').value.trim(),
+      departamento: document.getElementById('inp-dept').value.trim(),
+      sueldo: parseFloat(document.getElementById('inp-sueldo').value)
+    };
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true; btn.textContent = 'Guardando…';
+    try {
+      if (id) {
+        await api(`${id}/`, { method: 'PUT', body: JSON.stringify(body) });
+        toast('Empleado actualizado correctamente', 'success');
+      } else {
+        await api('', { method: 'POST', body: JSON.stringify(body) });
+        toast('Empleado creado correctamente', 'success');
+      }
+      closeModal();
+      loadEmpleados();
+    } catch {
+      toast('Error al guardar. Verifica los datos.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = id ? 'Guardar Cambios' : 'Guardar Empleado';
+    }
+  }
+
+  /* ─ DELETE ─ */
+  function confirmDelete(id, nombre) {
+    pendingDeleteId = id;
+    document.getElementById('confirm-msg').textContent = `Vas a eliminar a "${nombre}". Esta acción no se puede deshacer.`;
+    document.getElementById('confirm-overlay').classList.add('open');
+  }
+  function closeConfirm() {
+    pendingDeleteId = null;
+    document.getElementById('confirm-overlay').classList.remove('open');
+  }
+  function confirmOverlayClick(e) { if (e.target === document.getElementById('confirm-overlay')) closeConfirm(); }
+  document.getElementById('confirm-delete-btn').onclick = async () => {
+    if (!pendingDeleteId) return;
+    try {
+      await api(`${pendingDeleteId}/`, { method: 'DELETE' });
+      toast('Empleado eliminado', 'success');
+      loadEmpleados();
+    } catch { toast('Error al eliminar', 'error'); }
+    closeConfirm();
+  };
+
+  /* ─ TOAST ─ */
+  function toast(msg, type = 'success') {
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.innerHTML = `<span>${type === 'success' ? '✓' : '⚠'}</span>${msg}`;
+    document.getElementById('toast-area').appendChild(el);
+    setTimeout(() => { el.style.animation = 'slideOut .3s ease forwards'; setTimeout(() => el.remove(), 300); }, 3000);
+  }
+
+  /* ─ KEYBOARD ─ */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeModal(); closeConfirm(); }
+  });
+
+  /* ─ INIT ─ */
+  loadEmpleados();
+</script>
+</body>
+</html>
